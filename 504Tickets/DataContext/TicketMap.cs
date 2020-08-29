@@ -54,11 +54,7 @@ namespace _504Tickets.DataContext
                 .IsRequired();
             builder.Property(e => e.Precio).HasColumnType("float")
               .IsRequired();
-            builder.Property(e => e.CantidadBoletos).HasColumnType("int").IsRequired();
-
-            builder.HasOne(e => e.Evento)
-            .WithMany(e => e.Categorias)
-            .HasForeignKey(e => e.IdEvento);
+            builder.Property(e => e.CantidadBoletos).HasColumnType("int").IsRequired();            
         }
     }
     public class CarritoMap : IEntityTypeConfiguration<Carrito>
@@ -139,6 +135,10 @@ namespace _504Tickets.DataContext
             builder.HasOne(e => e.Proveedor)
             .WithMany(e => e.Eventos)
             .HasForeignKey(e => e.IdProveedor);
+
+            builder.HasOne(e => e.Categoria)
+            .WithMany(e => e.Eventos)
+            .HasForeignKey(e => e.IdCategoria);
 
         }
 

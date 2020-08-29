@@ -52,26 +52,33 @@ namespace _504Tickets.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(verificador).State = EntityState.Modified;
-
-            try
+            if(verificador.Nombre.Length < 1 || verificador.Apellido.Length < 1 || verificador.Correo.Length < 1 || verificador.Password.Length < 1)
             {
-                await _context.SaveChangesAsync();
+                return NotFound("Los campos de nombre, apellido, correo y contraseña no pueden estar vacios");
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!VerificadorExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                _context.Entry(verificador).State = EntityState.Modified;
 
-            return NoContent();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!VerificadorExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
+            
         }
 
         // POST: api/Verificadors
@@ -80,10 +87,18 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Verificador>> PostVerificador(Verificador verificador)
         {
-            _context.Verificadores.Add(verificador);
-            await _context.SaveChangesAsync();
+            if(verificador.Nombre.Length<1 || verificador.Apellido.Length<1 || verificador.Correo.Length<1 || verificador.Password.Length<1)
+            {
+                return NotFound("Los campos de nombre, apellido, correo y contraseña no pueden estar vacios");
+            }
+            else
+            {
+                _context.Verificadores.Add(verificador);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVerificador", new { id = verificador.Id }, verificador);
+                return CreatedAtAction("GetVerificador", new { id = verificador.Id }, verificador);
+            }            
+            
         }
 
         // DELETE: api/Verificadors/5

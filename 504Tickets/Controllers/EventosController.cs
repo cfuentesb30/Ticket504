@@ -25,14 +25,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Evento>>> GetEventos()
         {
-            return await _context.Eventos.ToListAsync();
+            return await _context.Eventos.Include(q => q.Proveedor).Include(q => q.Categoria).Include(q => q.VerificadoresEventos).ToListAsync();
         }
 
         // GET: api/Eventos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Evento>> GetEvento(int id)
         {
-            var evento = await _context.Eventos.FindAsync(id);
+            var evento = await _context.Eventos.Include(q => q.Proveedor).Include(q => q.Categoria).Include(q => q.VerificadoresEventos).FirstOrDefaultAsync(q => q.Id == id);
 
             if (evento == null)
             {
@@ -48,30 +48,42 @@ namespace _504Tickets.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvento(int id, Evento evento)
         {
+            evento.FechaCreacion = DateTime.Today;
             if (id != evento.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(evento).State = EntityState.Modified;
-
-            try
+            else if(evento.Nombre.Length < 1 || evento.Ilustracion.Length < 1 || evento.CiudadEvento.Length < 1 || evento.DireccionEvento.Length < 1 || evento.Descripcion.Length < 1 || evento.Fecha.ToString().Length < 1 || evento.IdProveedor.ToString().Length < 1 || evento.IdCategoria.ToString().Length < 1)
             {
-                await _context.SaveChangesAsync();
+                return NotFound("Todos los campos deben ser completados");
             }
-            catch (DbUpdateConcurrencyException)
+            else if (evento.Fecha <= evento.FechaCreacion)
             {
-                if (!EventoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("La fecha ingresada es una fecha no valida");
             }
+            else
+            {
+                _context.Entry(evento).State = EntityState.Modified;
 
-            return NoContent();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!EventoExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
+            
         }
 
         // POST: api/Eventos
@@ -79,11 +91,24 @@ namespace _504Tickets.Controllers
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<Evento>> PostEvento(Evento evento)
-        {
-            _context.Eventos.Add(evento);
-            await _context.SaveChangesAsync();
+        {            
+            evento.FechaCreacion = DateTime.Today;
+            if (evento.Nombre.Length <1 || evento.Ilustracion.Length <1 || evento.CiudadEvento.Length <1 || evento.DireccionEvento.Length < 1 || evento.Descripcion.Length < 1 || evento.Fecha.ToString().Length <1 || evento.IdProveedor.ToString().Length < 1 || evento.IdCategoria.ToString().Length < 1)
+            {
+                return NotFound("Todos los campos deben ser completados");
+            }
+            else if(evento.Fecha <= evento.FechaCreacion)
+            {
+                return NotFound("La fecha ingresada es una fecha no valida");
+            }
+            else
+            {
+                _context.Eventos.Add(evento);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvento", new { id = evento.Id }, evento);
+                return CreatedAtAction("GetEvento", new { id = evento.Id }, evento);
+            }
+            
         }
 
         // DELETE: api/Eventos/5

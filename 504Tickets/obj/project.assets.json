@@ -8916,19 +8916,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\carje\\.nuget\\packages\\": {}
+    "C:\\Users\\Osorio\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\carje\\Desktop\\Ing del Soft 2\\504Tickets\\5042\\504Tickets\\504Tickets\\504Tickets.csproj",
+      "projectUniqueName": "C:\\Users\\Osorio\\Desktop\\Miguel Osorio Ceutec\\III 2020\\Ingenieria de Software II\\504Tickets\\504Tickets\\504Tickets.csproj",
       "projectName": "504Tickets",
-      "projectPath": "C:\\Users\\carje\\Desktop\\Ing del Soft 2\\504Tickets\\5042\\504Tickets\\504Tickets\\504Tickets.csproj",
-      "packagesPath": "C:\\Users\\carje\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\carje\\Desktop\\Ing del Soft 2\\504Tickets\\5042\\504Tickets\\504Tickets\\obj\\",
+      "projectPath": "C:\\Users\\Osorio\\Desktop\\Miguel Osorio Ceutec\\III 2020\\Ingenieria de Software II\\504Tickets\\504Tickets\\504Tickets.csproj",
+      "packagesPath": "C:\\Users\\Osorio\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Osorio\\Desktop\\Miguel Osorio Ceutec\\III 2020\\Ingenieria de Software II\\504Tickets\\504Tickets\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\carje\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Osorio\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -8997,7 +8997,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
       }
     }
   }

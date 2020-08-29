@@ -18,7 +18,8 @@ namespace _504Tickets.Models
         public bool Status { get; set; }
         public int IdProveedor { get; set; } //FK
         public Proveedor Proveedor { get; set; }
-        public List<Categoria> Categorias { get; set; }
+        public int IdCategoria { get; set; }//FK
+        public Categoria Categoria { get; set; }
         public List<VerificadorEvento> VerificadoresEventos { get; set; }
 
     }

@@ -25,14 +25,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VerificadorEvento>>> GetVerificadoresEventos()
         {
-            return await _context.VerificadoresEventos.ToListAsync();
+            return await _context.VerificadoresEventos.Include(q => q.Eventos).Include(q => q.Verificadores).ToListAsync();
         }
 
         // GET: api/VerificadorEventos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<VerificadorEvento>> GetVerificadorEvento(int id)
         {
-            var verificadorEvento = await _context.VerificadoresEventos.FindAsync(id);
+            var verificadorEvento = await _context.VerificadoresEventos.Include(q => q.Eventos).Include(q => q.Verificadores).FirstOrDefaultAsync(q => q.Id == id);
 
             if (verificadorEvento == null)
             {
@@ -53,25 +53,43 @@ namespace _504Tickets.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(verificadorEvento).State = EntityState.Modified;
-
-            try
+            Verificador verificador = await _context.Verificadores.FirstOrDefaultAsync(q => q.Id == verificadorEvento.IdVerificador);
+            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == verificadorEvento.IdEvento);
+            if (verificadorEvento.IdEvento.ToString().Length < 1 || verificadorEvento.IdVerificador.ToString().Length < 1)
             {
-                await _context.SaveChangesAsync();
+                return NotFound("el Id del evento y el Id del verificador no pueden estar vacios");
             }
-            catch (DbUpdateConcurrencyException)
+            if (verificador == null)
             {
-                if (!VerificadorEventoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("El id del verificador ingresado no coincide con ningun verificador existente");
             }
+            else if (evento == null)
+            {
+                return NotFound("El id del evento ingresado no coincide con ningun evento creado");
+            }
+            else
+            {
+                _context.Entry(verificadorEvento).State = EntityState.Modified;
 
-            return NoContent();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!VerificadorEventoExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
+            
         }
 
         // POST: api/VerificadorEventos
@@ -80,10 +98,28 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<VerificadorEvento>> PostVerificadorEvento(VerificadorEvento verificadorEvento)
         {
-            _context.VerificadoresEventos.Add(verificadorEvento);
-            await _context.SaveChangesAsync();
+            Verificador verificador = await _context.Verificadores.FirstOrDefaultAsync(q => q.Id == verificadorEvento.IdVerificador);
+            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == verificadorEvento.IdEvento);
+            if(verificadorEvento.IdEvento.ToString().Length < 1 || verificadorEvento.IdVerificador.ToString().Length < 1)
+            {
+                return NotFound("el Id del evento y el Id del verificador no pueden estar vacios");
+            }
+            if(verificador == null)
+            {
+                return NotFound("El id del verificador ingresado no coincide con ningun verificador existente");
+            }
+            else if(evento == null)
+            {
+                return NotFound("El id del evento ingresado no coincide con ningun evento creado");
+            }
+            else
+            {
+                _context.VerificadoresEventos.Add(verificadorEvento);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVerificadorEvento", new { id = verificadorEvento.Id }, verificadorEvento);
+                return CreatedAtAction("GetVerificadorEvento", new { id = verificadorEvento.Id }, verificadorEvento);
+            }
+
         }
 
         // DELETE: api/VerificadorEventos/5

@@ -10,9 +10,8 @@ namespace _504Tickets.Models
         public int Id { get; set; } //PK
         public string NombreCategoria { get; set; }
         public double Precio { get; set; }
-        public int CantidadBoletos { get; set; }
-        public int IdEvento { get; set; } //FK
-        public Evento Evento { get; set; }
+        public int CantidadBoletos { get; set; }        
+        public List<Evento> Eventos { get; set; }
         public List<Carrito> Carritos { get; set; }
         public List<Ticket> Tickets { get; set; }
     }
