@@ -52,26 +52,29 @@ namespace _504Tickets.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(red).State = EntityState.Modified;
-
-            try
+            else if (red.Nombre == null || red.Nombre.Length <= 0)
             {
+                return NotFound("Se debe de ingresar el nombre de la red");
+            }
+            if (red.Link == null || red.Link.Length <= 0)
+            {
+                return NotFound("Se debe de ingresar el link de la red");
+            }
+
+            bool isUri = Uri.IsWellFormedUriString(red.Link, UriKind.RelativeOrAbsolute);
+            if (isUri == false)
+            {
+                return NotFound("Se debe de ingresar un link valido");
+            }
+            else
+            {
+                _context.Entry(red).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RedExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                return NoContent();
             }
 
-            return NoContent();
+            
         }
 
         // POST: api/Reds
@@ -80,6 +83,22 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Red>> PostRed(Red red)
         {
+
+            if (red.Nombre == null || red.Nombre.Length <= 0)
+            {
+                return NotFound("Se debe de ingresar el nombre de la red");
+            }
+            if (red.Link == null || red.Link.Length <= 0)
+            {
+                return NotFound("Se debe de ingresar el link de la red");
+            }
+
+           bool isUri = Uri.IsWellFormedUriString(red.Link, UriKind.RelativeOrAbsolute);
+            if (isUri == false)
+            {
+                return NotFound("Se debe de ingresar un link valido");
+            }
+
             _context.Redes.Add(red);
             await _context.SaveChangesAsync();
 
@@ -100,11 +119,6 @@ namespace _504Tickets.Controllers
             await _context.SaveChangesAsync();
 
             return red;
-        }
-
-        private bool RedExists(int id)
-        {
-            return _context.Redes.Any(e => e.Id == id);
         }
     }
 }

@@ -25,14 +25,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets()
         {
-            return await _context.Tickets.ToListAsync();
+            return await _context.Tickets.Include(q => q.Categorias).Include(q => q.Usuarios).ToListAsync();
         }
 
         // GET: api/Tickets/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Ticket>> GetTicket(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = await _context.Tickets.Include(q => q.Categorias).Include(q => q.Usuarios).FirstOrDefaultAsync(q => q.Id==id);
 
             if (ticket == null)
             {
@@ -48,30 +48,35 @@ namespace _504Tickets.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTicket(int id, Ticket ticket)
         {
+            Usuario usuario = await _context.Usuarios.FirstOrDefaultAsync(q => q.Id == ticket.UsuarioId);
+            Categoria categoria = await _context.Categorias.FirstOrDefaultAsync(q => q.Id == ticket.IdCategoria);
+
+            ticket.HoraFechaGenerado = DateTime.Today;
+            ticket.Status = false; //El boleto no fue escaneado
+
             if (id != ticket.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(ticket).State = EntityState.Modified;
-
-            try
+            else if (usuario == null)
             {
+                return NotFound("Debe de ingresar un Id de Usuario valido");
+            }
+            if (categoria == null)
+            {
+                return NotFound("Debe de ingresar un Id de Categoria valido");
+            }
+            
+            else
+            {
+                _context.Entry(ticket).State = EntityState.Modified;
+
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TicketExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                return NoContent();
             }
 
-            return NoContent();
+           
         }
 
         // POST: api/Tickets
@@ -80,6 +85,19 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
         {
+            Usuario usuario = await _context.Usuarios.FirstOrDefaultAsync(q => q.Id==ticket.UsuarioId);
+            Categoria categoria = await _context.Categorias.FirstOrDefaultAsync(q => q.Id == ticket.IdCategoria);
+
+            ticket.HoraFechaGenerado = DateTime.Today;
+            if (usuario==null)
+            {
+                return NotFound("Debe de ingresar un Id de Usuario valido");
+            }
+            if (categoria==null)
+            {
+                return NotFound("Debe de ingresar un Id de Categoria valido");
+            }
+            ticket.Status = false; //El boleto no fue escaneado
             _context.Tickets.Add(ticket);
             await _context.SaveChangesAsync();
 
@@ -100,11 +118,6 @@ namespace _504Tickets.Controllers
             await _context.SaveChangesAsync();
 
             return ticket;
-        }
-
-        private bool TicketExists(int id)
-        {
-            return _context.Tickets.Any(e => e.Id == id);
         }
     }
 }
