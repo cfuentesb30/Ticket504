@@ -74,7 +74,7 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Categoria>> PostCategoria(Categoria categoria)
         {
-            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == categoria.IdEvento);
+            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == categoria.Id);
             if (evento == null)
             {
                 return NotFound("El Evento No Existe ");

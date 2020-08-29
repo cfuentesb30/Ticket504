@@ -52,13 +52,38 @@ namespace _504Tickets.Controllers
             {
                 return BadRequest();
             }
+            DateTime hora = DateTime.Today;
+            usuario.Status = true;
+            if (usuario.Nombre.Length < 1 || usuario.Apellido.Length < 1 || usuario.Correo.Length < 1 || usuario.Password.Length < 1 || usuario.FechaNacimiento.ToString().Length < 1 || usuario.Foto.Length < 1 || usuario.Telefono.ToString().Length < 1)
+            {
+                return NotFound("Se debe ingresar la informacion de todos los campos");
+            }
+            else if (usuario.FechaNacimiento < hora)
+            {
+                return NotFound("La fecha de nacimiento ingresada no es una fecha valida");
+            }
+            else
+            {
+                _context.Entry(usuario).State = EntityState.Modified;
 
-            _context.Entry(usuario).State = EntityState.Modified;
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UsuarioExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
 
-                await _context.SaveChangesAsync();
-          
-
-            return NoContent();
+                return NoContent();
+            }                
         }
 
         // POST: api/Usuarios
@@ -67,11 +92,23 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
-            //calidar correo y password prrona
-            _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
+            DateTime hora = DateTime.Today;
+            usuario.Status = true;
+            if (usuario.Nombre.Length <1 || usuario.Apellido.Length <1 || usuario.Correo.Length <1 || usuario.Password.Length <1 || usuario.FechaNacimiento.ToString().Length <1 || usuario.Foto.Length < 1 || usuario.Telefono.ToString().Length <1)
+            {
+                return NotFound("Se debe ingresar la informacion de todos los campos");
+            }
+            else if (usuario.FechaNacimiento < hora)
+            {
+                return NotFound("La fecha de nacimiento ingresada no es una fecha valida");
+            }
+            else
+            {
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUsuario", new { id = usuario.Id }, usuario);
+                return CreatedAtAction("GetUsuario", new { id = usuario.Id }, usuario);
+            }            
         }
 
         // DELETE: api/Usuarios/5

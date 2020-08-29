@@ -11,6 +11,5 @@ namespace _504Tickets.Models
         public int Id { get; set; } //PK
         public string Link { get; set; }
         public string Nombre { get; set; }
-
     }
 }

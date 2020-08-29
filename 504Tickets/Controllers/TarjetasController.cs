@@ -25,14 +25,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tarjeta>>> GetTarjetas()
         {
-            return await _context.Tarjetas.ToListAsync();
+            return await _context.Tarjetas.Include(q => q.Usuarios).ToListAsync();
         }
 
         // GET: api/Tarjetas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Tarjeta>> GetTarjeta(int id)
         {
-            var tarjeta = await _context.Tarjetas.FindAsync(id);
+            var tarjeta = await _context.Tarjetas.Include(q => q.Usuarios).FirstOrDefaultAsync(q => q.Id ==id);
 
             if (tarjeta == null)
             {
@@ -48,31 +48,46 @@ namespace _504Tickets.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTarjeta(int id, Tarjeta tarjeta)
         {
+            Usuario usuario = await _context.Usuarios.FirstOrDefaultAsync(q => q.Id == tarjeta.IdUsuario);
             if (id != tarjeta.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(tarjeta).State = EntityState.Modified;
-
-            try
+            else if (tarjeta.NumTarjeta.ToString().Length < 1 || tarjeta.CardHolder.Length < 1 || tarjeta.YearExp.ToString().Length < 1 || tarjeta.MonthExp.ToString().Length < 1 || tarjeta.CodigoCVV.ToString().Length < 1 || tarjeta.IdUsuario.ToString().Length < 1)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TarjetaExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("Todos los datos de la tarjeta correspondientes a la tarjeta deben de ser ingresados");
             }
 
-            return NoContent();
+            else if (usuario == null)
+            {
+                return NotFound("El id de usuario ingresado no coincide con ningun usuario existente");
+            }
+            else
+            {
+                _context.Entry(tarjeta).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TarjetaExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
         }
+
+            
 
         // POST: api/Tarjetas
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -80,10 +95,23 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Tarjeta>> PostTarjeta(Tarjeta tarjeta)
         {
-            _context.Tarjetas.Add(tarjeta);
-            await _context.SaveChangesAsync();
+            Usuario usuario = await _context.Usuarios.FirstOrDefaultAsync(q => q.Id == tarjeta.IdUsuario);
+            if (tarjeta.NumTarjeta.ToString().Length <1 || tarjeta.CardHolder.Length <1 || tarjeta.YearExp.ToString().Length <1 || tarjeta.MonthExp.ToString().Length <1 || tarjeta.CodigoCVV.ToString().Length <1 || tarjeta.IdUsuario.ToString().Length <1)
+            {
+                return NotFound("Todos los datos de la tarjeta correspondientes a la tarjeta deben de ser ingresados");
+            }
+            else if(usuario == null)
+            {
+                return NotFound("El id de usuario ingresado no coincide con ningun usuario existente");
+            }
+            else
+            {
+                _context.Tarjetas.Add(tarjeta);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTarjeta", new { id = tarjeta.Id }, tarjeta);
+                return CreatedAtAction("GetTarjeta", new { id = tarjeta.Id }, tarjeta);
+            }
+            
         }
 
         // DELETE: api/Tarjetas/5
