@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using _504Tickets.DataContext;
 using _504Tickets.Models;
+using System.Text.RegularExpressions;
 
 namespace _504Tickets.Controllers
 {
@@ -25,14 +26,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Proveedor>>> GetProveedores()
         {
-            return await _context.Proveedores.ToListAsync();
+            return await _context.Proveedores.Include(q => q.Eventos).ToListAsync();
         }
 
         // GET: api/Proveedors/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Proveedor>> GetProveedor(int id)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
+            var proveedor = await _context.Proveedores.Include(q => q.Eventos).FirstOrDefaultAsync(q => q.Id==id);
 
             if (proveedor == null)
             {
@@ -52,26 +53,44 @@ namespace _504Tickets.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(proveedor).State = EntityState.Modified;
-
-            try
+            else if (proveedor.Nombre.Length <= 0 || proveedor.Nombre == null)
             {
+                return NotFound("Debe de ingresar el nombre del Proveedor");
+            }
+            if (proveedor.NombreEmpresa.Length <= 0 || proveedor.NombreEmpresa == null)
+            {
+                return NotFound("Debe de ingresar el nombre de la empresa");
+            }
+            if (proveedor.RTN.ToString().Length <= 0 || proveedor.RTN <= 0)
+            {
+                return NotFound("Debe de ingresar el RTN");
+            }
+            if (proveedor.Correo.Length <= 0 || proveedor.Correo == null)
+            {
+                return NotFound("Debe de ingresar el correo");
+            }
+            if (proveedor.Password.Length <= 0 || proveedor.Password == null)
+            {
+                return NotFound("Debe de ingresar una contraseña");
+            }
+            if (proveedor.Logo.Length <= 0 || proveedor.Logo == null)
+            {
+                return NotFound("Debe de ingresar una imagen del proveedor");
+            }
+            if (proveedor.Telefono.ToString().Length <= 0 || proveedor.Telefono <= 0)
+            {
+                return NotFound("Debe de ingresar el telefono");
+            }
+            else
+            {
+                _context.Entry(proveedor).State = EntityState.Modified;
+
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProveedorExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                return NoContent();
             }
 
-            return NoContent();
+           
         }
 
         // POST: api/Proveedors
@@ -80,6 +99,35 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Proveedor>> PostProveedor(Proveedor proveedor)
         {
+
+            if (proveedor.Nombre.Length <= 0 || proveedor.Nombre == null)
+            {
+                return NotFound("Debe de ingresar el nombre del Proveedor");
+            }
+            if (proveedor.NombreEmpresa.Length <= 0 || proveedor.NombreEmpresa == null)
+            {
+                return NotFound("Debe de ingresar el nombre de la empresa");
+            }
+            if (proveedor.RTN.ToString().Length <= 0 || proveedor.RTN <= 0)
+            {
+                return NotFound("Debe de ingresar el RTN");
+            }
+            if (proveedor.Correo.Length <= 0 || proveedor.Correo == null)
+            {
+                return NotFound("Debe de ingresar el correo");
+            }
+            if (proveedor.Password.Length <= 0 || proveedor.Password == null)
+            {
+                return NotFound("Debe de ingresar una contraseña");
+            }
+            if (proveedor.Logo.Length <= 0 || proveedor.Logo == null)
+            {
+                return NotFound("Debe de ingresar una imagen del proveedor");
+            }
+            if (proveedor.Telefono.ToString().Length <= 0 || proveedor.Telefono <= 0)
+            {
+                return NotFound("Debe de ingresar el telefono");
+            }
             _context.Proveedores.Add(proveedor);
             await _context.SaveChangesAsync();
 
@@ -100,11 +148,6 @@ namespace _504Tickets.Controllers
             await _context.SaveChangesAsync();
 
             return proveedor;
-        }
-
-        private bool ProveedorExists(int id)
-        {
-            return _context.Proveedores.Any(e => e.Id == id);
         }
     }
 }
