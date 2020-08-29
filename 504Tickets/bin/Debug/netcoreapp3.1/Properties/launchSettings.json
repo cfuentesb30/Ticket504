@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/Carritos",
+      "launchUrl": "api/Usuarios",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "_504Tickets": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/Carritos",
+      "launchUrl": "api/Usuarios",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

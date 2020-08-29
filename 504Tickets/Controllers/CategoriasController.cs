@@ -25,14 +25,14 @@ namespace _504Tickets.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
         {
-            return await _context.Categorias.Include(q => q.Evento.Nombre).Include(w => w.Carritos).Include(e => e.Tickets).ToListAsync();
+            return await _context.Categorias.Include(q => q.Eventos).Include(w => w.Carritos).Include(e => e.Tickets).ToListAsync();
         }
 
         // GET: api/Categorias/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Categoria>> GetCategoria(int id)
         {
-            var categoria = await _context.Categorias.Include(q=>q.Evento.Nombre).Include(w=>w.Carritos).Include(e=>e.Tickets).FirstOrDefaultAsync(q=>q.Id == id);
+            var categoria = await _context.Categorias.Include(q=>q.Eventos).Include(w=>w.Carritos).Include(e=>e.Tickets).FirstOrDefaultAsync(q=>q.Id == id);
 
             if (categoria == null)
             {
@@ -48,7 +48,7 @@ namespace _504Tickets.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategoria(int id, Categoria categoria)
         {
-            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == categoria.Id);
+            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.IdCategoria == categoria.Id);
 
             if (id != categoria.Id)
             {
@@ -74,7 +74,7 @@ namespace _504Tickets.Controllers
         [HttpPost]
         public async Task<ActionResult<Categoria>> PostCategoria(Categoria categoria)
         {
-            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.Id == categoria.Id);
+            Evento evento = await _context.Eventos.FirstOrDefaultAsync(q => q.IdCategoria == categoria.Id);
             if (evento == null)
             {
                 return NotFound("El Evento No Existe ");
